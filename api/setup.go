@@ -1,9 +1,7 @@
 package api
 
 import (
-	"hackpoints/api/auth"
 	"hackpoints/api/user"
-	"hackpoints/datastore/in_memory"
 	"net/http"
 	"time"
 
@@ -12,19 +10,14 @@ import (
 )
 
 type API struct {
-	userServer *user.UserServer
+	UserServer *user.UserServer
 }
 
 // Setup - setup the web server
-func Setup() {
+func Setup(a API) {
 	r := mux.NewRouter()
 
-	setupRoutes(API{
-		&user.UserServer{
-			Store: &in_memory.InMemoryUserStore{},
-			Auth:  auth.Setup(&in_memory.InMemoryUserStore{}),
-		},
-	}, r)
+	setupRoutes(a, r)
 
 	srv := &http.Server{
 		Handler: r,

@@ -9,7 +9,7 @@ import (
 
 func setupRoutes(api API, r *mux.Router) {
 	authedRoutes := r.PathPrefix("/api/").Subrouter()
-	authedRoutes.Use(api.userServer.Auth.AuthMiddleware)
+	authedRoutes.Use(api.UserServer.Auth.AuthMiddleware)
 
 	r.HandleFunc("/api/info", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -26,9 +26,9 @@ func setupRoutes(api API, r *mux.Router) {
 		w.Write(j)
 	})
 
-	authedRoutes.HandleFunc("/user/", api.userServer.GetUser)
-	authedRoutes.HandleFunc("/auth/login", api.userServer.Login)
-	authedRoutes.HandleFunc("/auth/register", api.userServer.Register)
+	authedRoutes.HandleFunc("/user/", api.UserServer.GetUser)
+	authedRoutes.HandleFunc("/auth/login", api.UserServer.Login)
+	authedRoutes.HandleFunc("/auth/register", api.UserServer.Register)
 
 	r.HandleFunc("/login", serveLogin)
 
