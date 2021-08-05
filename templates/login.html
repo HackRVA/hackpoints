@@ -1,0 +1,69 @@
+<div id="login-form" action="#">
+    <i class="fa fa-user fa-5x"></i>
+    <input type="text" name="username" id="username" value="" />
+    <p class="form-field-err"></p>
+    <input type="password" name="password" id="password" value="" />
+    <p class="form-field-err"></p>
+    <input id="submitBtn" type="submit" value="LOGIN" onclick="validateFormOnSubmit(event)" />
+</div>
+<button id="go-to-register" onclick="handleRegisterClick()">Register</button>
+<form id="register-form" action="#" onsubmit="return validateFormOnSubmit(this);" style="display: none">
+    <i class="fa fa-user fa-5x"></i>
+    <input type="text" name="username" id="register-username" value="" />
+    <p class="form-field-err"></p>
+    <input type="password" name="password" id="register-password" value="" />
+    <p class="form-field-err"></p>
+    <input type="password" name="passwordCheck" id="passwordCheck" value="" />
+    <p class="form-field-err"></p>
+    <input type="submit" value="REGISTER" onclick="validateFormOnSubmit(event)" />
+</form>
+<script>
+    let showRegister = false;
+    function validateFormOnSubmit(e) {
+        e.preventDefault();
+        const username = document.getElementById("username");
+        const password = document.getElementById("password");
+        const registerUsername = document.getElementById("register-username");
+        const registerPassword = document.getElementById("register-password");
+        const passwordCheck = document.getElementById("passwordCheck");
+        if (showRegister) {
+            if (passwordCheck.value !== registerPassword.value) {
+                alert("must enter matching passwords");
+                return;
+            }
+            fetch("/api/auth/register", {
+                method: "POST",
+                body: JSON.stringify({
+                    email: registerUsername.value,
+                    password: registerPassword.value,
+                }),
+            }).then(() => {
+                window.location.reload();
+            });
+            return;
+        }
+        fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+                Authorization: "Basic " + btoa(username.value + ":" + password.value),
+            },
+        })
+            .then(result => result.json())
+            .then(({ token }) => {
+                localStorage.setItem("jwt", token);
+                window.location.href = "/";
+            });
+    }
+    function handleRegisterClick() {
+        if (!showRegister) {
+            document.getElementById("register-form").style.display = "";
+            document.getElementById("login-form").style.display = "none";
+            document.getElementById("go-to-register").style.display = "none";
+        } else {
+            document.getElementById("register-form").style.display = "none";
+            document.getElementById("login-form").style.display = "";
+        }
+        console.log("switch to register form");
+        showRegister = !showRegister;
+    }
+</script>
