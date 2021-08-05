@@ -1,6 +1,8 @@
 # Design Considerations
 At the time of writing, this project is in it's early stages.
 
+Please feel free to provide feedback or start discussions.
+
 ## How big should functions be?
 Functions should be small.
 
@@ -33,4 +35,15 @@ At the time of writing this, I've built a few ["in_memory" datastores](https://g
 If it's in the main branch, it should be able to run.
 You can make branches, but ideally, they shouldn't live long.
 
-Eventually we will hook this up to automatically deploy (after running tests) what's in the main branch.
+Eventually we will hook this up to automatically deploy (after running tests) the main branch on every commit.
+
+## Idiomatic
+Try to follow [idiomatic go](https://dmitri.shuralyov.com/idiomatic-go) where possible.
+It helps if you download and use the [go-tools](https://golang.org/doc/editors).
+
+## UI
+Open to ideas on what to do for a UI.
+Please reach out or start making commits!
+
+We did have some good experiences using [lit-element](https://lit-element.polymer-project.org/guide) in one of our other projects though.  It was very similar to using something like react.
+[memberdashboard](https://github.com/HackRVA/memberdashboard/tree/main/ui)
