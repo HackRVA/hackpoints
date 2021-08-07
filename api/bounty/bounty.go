@@ -114,3 +114,26 @@ func (b *BountyServer) Endorse(w http.ResponseWriter, r *http.Request) {
 	})
 	w.Write(j)
 }
+
+func (b *BountyServer) Close(w http.ResponseWriter, r *http.Request) {
+	bounty := &models.Bounty{}
+	err := json.NewDecoder(r.Body).Decode(bounty)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	bounty.IsOpen = false
+
+	err = b.Store.Update(*bounty)
+	if err != nil {
+		http.Error(w, ErrUpdatingBounty.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	j, _ := json.Marshal(models.EndpointSuccess{
+		Ack: true,
+	})
+	w.Write(j)
+}

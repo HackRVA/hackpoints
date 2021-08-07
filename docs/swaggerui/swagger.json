@@ -76,13 +76,36 @@
       }
     },
     "/api/bounty": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "bounty"
+        ],
+        "summary": "Retrieves many bounties.",
+        "operationId": "bounty",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/bountyResponse"
+          }
+        }
+      },
       "post": {
         "security": [
           {
             "basicAuth": []
           }
         ],
-        "description": "If no bounty is submitted, it will return all bounties.",
         "consumes": [
           "application/json"
         ],
@@ -96,14 +119,14 @@
         "tags": [
           "bounty"
         ],
-        "summary": "Retrieves one or many bounties.",
+        "summary": "Retrieves one bounty.",
         "operationId": "bountyGetRequest",
         "parameters": [
           {
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Bounty"
+              "$ref": "#/definitions/BountyID"
             }
           }
         ],
@@ -114,14 +137,52 @@
         }
       }
     },
-    "/api/bounty/endorse": {
-      "post": {
+    "/api/bounty/close": {
+      "patch": {
         "security": [
           {
             "basicAuth": []
           }
         ],
-        "description": "Endorse a bounty",
+        "description": "Close a bounty",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "bounty"
+        ],
+        "operationId": "bountyCloseRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/BountyID"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/endpointSuccessResponse"
+          }
+        }
+      }
+    },
+    "/api/bounty/endorse": {
+      "patch": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "Endorse a bounty\nAn endorsement is basically assigning one point value to the bounty.\nA member can only endorse a bounty once.",
         "consumes": [
           "application/json"
         ],
@@ -141,7 +202,7 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Bounty"
+              "$ref": "#/definitions/BountyID"
             }
           }
         ],
@@ -159,7 +220,7 @@
             "basicAuth": []
           }
         ],
-        "description": "Creates a new bounty",
+        "description": "Creates a new bounty\nA bounty is a task or action item that one person or a group of people can complete.\nMembers will decide to endorse certain bounties.\nWhen the bounty is closed, the number of endorsements on that bounty gets added to the\ngroups total score.  At certain score intervals, we have a pizza party.",
         "consumes": [
           "application/json"
         ],
@@ -268,23 +329,38 @@
     "Bounty": {
       "type": "object",
       "properties": {
-        "Description": {
-          "type": "string"
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
         },
-        "Endorsements": {
+        "endorsements": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Member"
-          }
+          },
+          "x-go-name": "Endorsements"
         },
-        "ID": {
-          "type": "string"
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
         },
-        "IsOpen": {
-          "type": "boolean"
+        "isOpen": {
+          "type": "boolean",
+          "x-go-name": "IsOpen"
         },
-        "Title": {
-          "type": "string"
+        "title": {
+          "type": "string",
+          "x-go-name": "Title"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "BountyID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
         }
       },
       "x-go-package": "hackpoints/models"
@@ -381,6 +457,15 @@
     }
   },
   "responses": {
+    "bountyResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Bounty"
+      },
+      "headers": {
+        "Body": {}
+      }
+    },
     "endpointSuccessResponse": {
       "description": "",
       "schema": {

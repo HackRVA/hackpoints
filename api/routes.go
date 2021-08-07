@@ -60,11 +60,24 @@ func setupRoutes(api API, r *mux.Router) {
 	//     Responses:
 	//       200: scoreResponse
 	authedRoutes.HandleFunc("/score", api.ScoreServer.Get).Methods(http.MethodGet)
+	// swagger:route GET /api/bounty bounty bounty
+	//
+	// Retrieves many bounties.
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Schemes: http, https
+	//
+	//     Security:
+	//     - basicAuth:
+	//
+	//     Responses:
+	//       200: bountyResponse
+
 	// swagger:route POST /api/bounty bounty bountyGetRequest
 	//
-	// Retrieves one or many bounties.
-	//   If no bounty is submitted, it will return all bounties.
-	//
+	// Retrieves one bounty.
 	//     Consumes:
 	//     - application/json
 	//
@@ -82,6 +95,10 @@ func setupRoutes(api API, r *mux.Router) {
 	// swagger:route POST /api/bounty/new bounty bountyNewRequest
 	//
 	// Creates a new bounty
+	//   A bounty is a task or action item that one person or a group of people can complete.
+	//   Members will decide to endorse certain bounties.
+	//   When the bounty is closed, the number of endorsements on that bounty gets added to the
+	//   groups total score.  At certain score intervals, we have a pizza party.
 	//
 	//     Consumes:
 	//     - application/json
@@ -97,9 +114,11 @@ func setupRoutes(api API, r *mux.Router) {
 	//     Responses:
 	//       200: endpointSuccessResponse
 	authedRoutes.HandleFunc("/bounty/new", api.BountyServer.New).Methods(http.MethodPost)
-	// swagger:route POST /api/bounty/endorse bounty bountyEndorseRequest
+	// swagger:route PATCH /api/bounty/endorse bounty bountyEndorseRequest
 	//
 	// Endorse a bounty
+	//  An endorsement is basically assigning one point value to the bounty.
+	//  A member can only endorse a bounty once.
 	//
 	//     Consumes:
 	//     - application/json
@@ -114,7 +133,25 @@ func setupRoutes(api API, r *mux.Router) {
 	//
 	//     Responses:
 	//       200: endpointSuccessResponse
-	authedRoutes.HandleFunc("/bounty/endorse", api.BountyServer.Endorse).Methods(http.MethodPost)
+	authedRoutes.HandleFunc("/bounty/endorse", api.BountyServer.Endorse).Methods(http.MethodPatch)
+	// swagger:route PATCH /api/bounty/close bounty bountyCloseRequest
+	//
+	// Close a bounty
+	//
+	//     Consumes:
+	//     - application/json
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Schemes: http, https
+	//
+	//     Security:
+	//     - basicAuth:
+	//
+	//     Responses:
+	//       200: endpointSuccessResponse
+	authedRoutes.HandleFunc("/bounty/close", api.BountyServer.Endorse).Methods(http.MethodPatch)
 	// swagger:route GET /api/user user user
 	//
 	// Shows the current logged in user
@@ -166,8 +203,6 @@ func setupRoutes(api API, r *mux.Router) {
 	//     Responses:
 	//       200: endpointSuccessResponse
 	r.HandleFunc("/api/auth/register", api.UserServer.Register).Methods(http.MethodPost)
-
-	// r.HandleFunc("/login", serveLogin)
 
 	http.Handle("/", r)
 }
