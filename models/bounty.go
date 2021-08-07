@@ -10,7 +10,7 @@ type BountyStore interface {
 // swagger:parameters bountyNewRequest
 type bountyNewRequest struct {
 	// in: body
-	Body Bounty
+	Body NewBounty
 }
 
 // swagger:parameters bountyEndorseRequest
@@ -40,6 +40,13 @@ type BountyID struct {
 	ID string `json:"id"`
 }
 
+// NewBounty can't have endorsements by default
+//   and it is always created Open
+//   IDs are generated
+type NewBounty struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
 type Bounty struct {
 	ID           string   `json:"id"`
 	Title        string   `json:"title"`

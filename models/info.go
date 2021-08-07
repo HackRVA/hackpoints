@@ -11,4 +11,6 @@ type InfoResponse struct {
 	//
 	// Example: hello, world!
 	Message string `json:"message"`
+	Version int    `json:"version"`
+	Commit  string `json:"commit"`
 }

@@ -71,16 +71,6 @@ func TestNewBounty(t *testing.T) {
 			expectedHTTPStastub: http.StatusBadRequest,
 			expectedResponse:    ErrBadDescription.Error() + "\n",
 		},
-		{
-			TestName:            "should fail if we try to create a bounty that's closed",
-			ID:                  "someID2",
-			Title:               "Some TITLE",
-			Description:         "this is a fake bounty",
-			Endorsements:        []models.Member{{Email: "test"}},
-			IsOpen:              false,
-			expectedHTTPStastub: http.StatusBadRequest,
-			expectedResponse:    ErrCantCreateClosedBounty.Error() + "\n",
-		},
 	}
 
 	for _, tt := range tests {
@@ -117,11 +107,8 @@ func TestUpdateBounty(t *testing.T) {
 	})
 
 	bs.Store.New(models.Bounty{
-		ID:           "someID1",
-		Title:        "a new bounty",
-		Description:  "this is a fake bounty",
-		Endorsements: []models.Member{{Email: "test"}},
-		IsOpen:       true,
+		Title:       "a new bounty",
+		Description: "this is a fake bounty",
 	})
 
 	tests := []struct {
@@ -136,7 +123,7 @@ func TestUpdateBounty(t *testing.T) {
 	}{
 		{
 			TestName:            "should update an existing bounty",
-			ID:                  "someID1",
+			ID:                  "1",
 			Title:               "a new bounty",
 			Description:         "this is a fake bounty",
 			Endorsements:        []models.Member{{Email: "test"}},
@@ -187,11 +174,9 @@ func TestGetBounty(t *testing.T) {
 	}
 
 	bs.Store.New(models.Bounty{
-		ID:           "someID1",
-		Title:        "a new bounty",
-		Description:  "this is a fake bounty",
-		Endorsements: []models.Member{{Email: "test"}},
-		IsOpen:       true,
+		Title:       "a new bounty",
+		Description: "this is a fake bounty",
+		IsOpen:      true,
 	})
 
 	tests := []struct {
@@ -206,20 +191,15 @@ func TestGetBounty(t *testing.T) {
 	}{
 		{
 			TestName:            "should update an existing bounty",
-			ID:                  "someID1",
-			Title:               "a new bounty",
-			Description:         "this is a fake bounty",
-			Endorsements:        []models.Member{{Email: "test"}},
-			IsOpen:              true,
+			ID:                  "1",
 			expectedHTTPStastub: http.StatusOK,
-			expectedResponse:    "[{\"ID\":\"someID1\",\"Title\":\"a new bounty\",\"Description\":\"this is a fake bounty\",\"Endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"IsOpen\":true}]",
+			expectedResponse:    "[{\"id\":\"1\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"isOpen\":true}]",
 		},
 		{
 			TestName:            "should throw error if we try to get a bounty that doesn't exist",
 			ID:                  "doesn't exist",
 			Title:               "a new bounty",
 			Description:         "this is a fake bounty",
-			Endorsements:        []models.Member{{Email: "test"}},
 			IsOpen:              true,
 			expectedHTTPStastub: http.StatusNotFound,
 			expectedResponse:    ErrBountyNotFound.Error() + "\n",
@@ -253,11 +233,8 @@ func TestGetAllBounties(t *testing.T) {
 	}
 
 	bs.Store.New(models.Bounty{
-		ID:           "someID1",
-		Title:        "a new bounty",
-		Description:  "this is a fake bounty",
-		Endorsements: []models.Member{{Email: "test"}},
-		IsOpen:       true,
+		Title:       "a new bounty",
+		Description: "this is a fake bounty",
 	})
 
 	tests := []struct {
@@ -272,13 +249,11 @@ func TestGetAllBounties(t *testing.T) {
 	}{
 		{
 			TestName:            "should update an existing bounty",
-			ID:                  "someID1",
 			Title:               "a new bounty",
 			Description:         "this is a fake bounty",
-			Endorsements:        []models.Member{{Email: "test"}},
 			IsOpen:              true,
 			expectedHTTPStastub: http.StatusOK,
-			expectedResponse:    "[{\"ID\":\"someID1\",\"Title\":\"a new bounty\",\"Description\":\"this is a fake bounty\",\"Endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"IsOpen\":true}]",
+			expectedResponse:    "[{\"id\":\"1\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"isOpen\":true},{\"id\":\"2\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true},{\"id\":\"3\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true},{\"id\":\"4\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true}]",
 		},
 		{
 			TestName:            "should throw error if we try to get a bounty that doesn't exist",

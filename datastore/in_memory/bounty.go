@@ -3,6 +3,7 @@ package in_memory
 import (
 	"errors"
 	"hackpoints/models"
+	"strconv"
 )
 
 var bounties = map[string]models.Bounty{}
@@ -10,6 +11,8 @@ var bounties = map[string]models.Bounty{}
 type InMemoryBountyStore struct{}
 
 func (b *InMemoryBountyStore) New(m models.Bounty) error {
+	m.ID = strconv.Itoa(len(bounties) + 1)
+	m.IsOpen = true
 	bounties[m.ID] = m
 	return nil
 }

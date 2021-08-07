@@ -1,7 +1,7 @@
 {
   "schemes": [
-    "http",
-    "https"
+    "https",
+    "http"
   ],
   "swagger": "2.0",
   "info": {
@@ -28,10 +28,6 @@
         "produces": [
           "application/json"
         ],
-        "schemes": [
-          "http",
-          "https"
-        ],
         "tags": [
           "auth"
         ],
@@ -46,13 +42,9 @@
     },
     "/api/auth/register": {
       "post": {
-        "description": "Register a new user of the app",
+        "description": "Register a new user of the app\nEventually this will verify that only a valid member can sign up.\nCurrently this endpoint doesn't work until we get a database.",
         "produces": [
           "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
         ],
         "tags": [
           "auth"
@@ -85,10 +77,6 @@
         "produces": [
           "application/json"
         ],
-        "schemes": [
-          "http",
-          "https"
-        ],
         "tags": [
           "bounty"
         ],
@@ -111,10 +99,6 @@
         ],
         "produces": [
           "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
         ],
         "tags": [
           "bounty"
@@ -144,20 +128,17 @@
             "basicAuth": []
           }
         ],
-        "description": "Close a bounty",
+        "description": "When a bounty is completed, it's no longer available for people to endorse.\nAll closed bounties will have the number of endorsements added to the Space's total score.",
         "consumes": [
           "application/json"
         ],
         "produces": [
           "application/json"
         ],
-        "schemes": [
-          "http",
-          "https"
-        ],
         "tags": [
           "bounty"
         ],
+        "summary": "Close a bounty",
         "operationId": "bountyCloseRequest",
         "parameters": [
           {
@@ -182,20 +163,17 @@
             "basicAuth": []
           }
         ],
-        "description": "Endorse a bounty\nAn endorsement is basically assigning one point value to the bounty.\nA member can only endorse a bounty once.",
+        "description": "An endorsement is basically assigning one point value to the bounty.\nA member can only endorse a bounty once.",
         "consumes": [
           "application/json"
         ],
         "produces": [
           "application/json"
         ],
-        "schemes": [
-          "http",
-          "https"
-        ],
         "tags": [
           "bounty"
         ],
+        "summary": "Endorse a bounty",
         "operationId": "bountyEndorseRequest",
         "parameters": [
           {
@@ -220,27 +198,24 @@
             "basicAuth": []
           }
         ],
-        "description": "Creates a new bounty\nA bounty is a task or action item that one person or a group of people can complete.\nMembers will decide to endorse certain bounties.\nWhen the bounty is closed, the number of endorsements on that bounty gets added to the\ngroups total score.  At certain score intervals, we have a pizza party.",
+        "description": "A bounty is a task or action item that one person or a group of people can complete.\nMembers will decide to endorse certain bounties.\nWhen the bounty is closed, the number of endorsements on that bounty gets added to the\ngroups total score.  At certain score intervals, we have a pizza party.",
         "consumes": [
           "application/json"
         ],
         "produces": [
           "application/json"
         ],
-        "schemes": [
-          "http",
-          "https"
-        ],
         "tags": [
           "bounty"
         ],
+        "summary": "Creates a new bounty",
         "operationId": "bountyNewRequest",
         "parameters": [
           {
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Bounty"
+              "$ref": "#/definitions/NewBounty"
             }
           }
         ],
@@ -253,17 +228,14 @@
     },
     "/api/info": {
       "get": {
-        "description": "Returns some debug info",
+        "description": "Version and commit hash",
         "produces": [
           "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
         ],
         "tags": [
           "info"
         ],
+        "summary": "Returns some debug info",
         "operationId": "info",
         "responses": {
           "200": {
@@ -279,17 +251,14 @@
             "basicAuth": []
           }
         ],
-        "description": "Shows the current score for the space",
+        "description": "Score is tallied by adding up the number of endorsements on closed bounties",
         "produces": [
           "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
         ],
         "tags": [
           "score"
         ],
+        "summary": "Shows the current score for the space",
         "operationId": "score",
         "responses": {
           "200": {
@@ -305,17 +274,14 @@
             "basicAuth": []
           }
         ],
-        "description": "Shows the current logged in user",
+        "description": "retrieve user information so that we can easily display it in UIs",
         "produces": [
           "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
         ],
         "tags": [
           "user"
         ],
+        "summary": "Shows the current logged in user",
         "operationId": "user",
         "responses": {
           "200": {
@@ -403,11 +369,20 @@
       "description": "InfoResponse -- response of info request",
       "type": "object",
       "properties": {
+        "commit": {
+          "type": "string",
+          "x-go-name": "Commit"
+        },
         "message": {
           "description": "Info Message",
           "type": "string",
           "x-go-name": "Message",
           "example": "hello, world!"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Version"
         }
       },
       "x-go-package": "hackpoints/models"
@@ -427,6 +402,21 @@
         "name": {
           "type": "string",
           "x-go-name": "Name"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "NewBounty": {
+      "description": "NewBounty can't have endorsements by default\nand it is always created Open\nIDs are generated",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "title": {
+          "type": "string",
+          "x-go-name": "Title"
         }
       },
       "x-go-package": "hackpoints/models"

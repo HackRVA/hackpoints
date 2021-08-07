@@ -5,6 +5,8 @@ import (
 	"hackpoints/models"
 	"net/http"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/shaj13/go-guardian/v2/auth"
 )
 
@@ -18,9 +20,6 @@ func validateNewBounty(b models.Bounty) error {
 	}
 	if len(b.Description) < 15 {
 		return ErrBadDescription
-	}
-	if !b.IsOpen {
-		return ErrCantCreateClosedBounty
 	}
 	return nil
 }
@@ -77,18 +76,17 @@ func (b *BountyServer) Get(w http.ResponseWriter, r *http.Request) {
 	bounty := &models.Bounty{}
 	err := json.NewDecoder(r.Body).Decode(bounty)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		log.Debug("could not decode a bounty", err)
 	}
 
-	response, err := b.Store.Get(*bounty)
+	bounties, err := b.Store.Get(*bounty)
 	if err != nil {
 		http.Error(w, ErrBountyNotFound.Error(), http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	j, _ := json.Marshal(response)
+	j, _ := json.Marshal(bounties)
 	w.Write(j)
 }
 

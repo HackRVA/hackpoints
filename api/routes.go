@@ -1,6 +1,7 @@
-//     Schemes: http, https
 //     Version: 0.0.1
 //     License: MIT http://opensource.org/licenses/MIT
+//
+//    Schemes: https, http
 //
 //    SecurityDefinitions:
 //    bearerAuth:
@@ -19,6 +20,7 @@ package api
 
 import (
 	"encoding/json"
+	"hackpoints/models"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -31,28 +33,30 @@ func setupRoutes(api API, r *mux.Router) {
 	//
 	// Returns some debug info
 	//
+	//   Version and commit hash
+	//
 	//     Produces:
 	//     - application/json
 	//
-	//     Schemes: http, https
-	//
 	//     Responses:
 	//       200: infoResponse
-	r.HandleFunc("/info", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/api/info", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		j, _ := json.Marshal(struct{ Message string }{
+		j, _ := json.Marshal(models.InfoResponse{
 			Message: "hello, world!",
+			Version: 0,
+			Commit:  "demo",
 		})
 		w.Write(j)
-	})
+	}).Methods(http.MethodGet)
 	// swagger:route GET /api/score score score
 	//
 	// Shows the current score for the space
 	//
+	//   Score is tallied by adding up the number of endorsements on closed bounties
+	//
 	//     Produces:
 	//     - application/json
-	//
-	//     Schemes: http, https
 	//
 	//     Security:
 	//     - basicAuth:
@@ -67,8 +71,6 @@ func setupRoutes(api API, r *mux.Router) {
 	//     Produces:
 	//     - application/json
 	//
-	//     Schemes: http, https
-	//
 	//     Security:
 	//     - basicAuth:
 	//
@@ -78,13 +80,12 @@ func setupRoutes(api API, r *mux.Router) {
 	// swagger:route POST /api/bounty bounty bountyGetRequest
 	//
 	// Retrieves one bounty.
+	//
 	//     Consumes:
 	//     - application/json
 	//
 	//     Produces:
 	//     - application/json
-	//
-	//     Schemes: http, https
 	//
 	//     Security:
 	//     - basicAuth:
@@ -95,6 +96,7 @@ func setupRoutes(api API, r *mux.Router) {
 	// swagger:route POST /api/bounty/new bounty bountyNewRequest
 	//
 	// Creates a new bounty
+	//
 	//   A bounty is a task or action item that one person or a group of people can complete.
 	//   Members will decide to endorse certain bounties.
 	//   When the bounty is closed, the number of endorsements on that bounty gets added to the
@@ -106,8 +108,6 @@ func setupRoutes(api API, r *mux.Router) {
 	//     Produces:
 	//     - application/json
 	//
-	//     Schemes: http, https
-	//
 	//     Security:
 	//     - basicAuth:
 	//
@@ -117,6 +117,7 @@ func setupRoutes(api API, r *mux.Router) {
 	// swagger:route PATCH /api/bounty/endorse bounty bountyEndorseRequest
 	//
 	// Endorse a bounty
+	//
 	//  An endorsement is basically assigning one point value to the bounty.
 	//  A member can only endorse a bounty once.
 	//
@@ -125,8 +126,6 @@ func setupRoutes(api API, r *mux.Router) {
 	//
 	//     Produces:
 	//     - application/json
-	//
-	//     Schemes: http, https
 	//
 	//     Security:
 	//     - basicAuth:
@@ -138,13 +137,15 @@ func setupRoutes(api API, r *mux.Router) {
 	//
 	// Close a bounty
 	//
+	//   When a bounty is completed, it's no longer available for people to endorse.
+	//   All closed bounties will have the number of endorsements added to the Space's total score.
+	//
 	//     Consumes:
 	//     - application/json
 	//
 	//     Produces:
 	//     - application/json
 	//
-	//     Schemes: http, https
 	//
 	//     Security:
 	//     - basicAuth:
@@ -156,17 +157,17 @@ func setupRoutes(api API, r *mux.Router) {
 	//
 	// Shows the current logged in user
 	//
+	//   retrieve user information so that we can easily display it in UIs
+	//
 	//     Produces:
 	//     - application/json
-	//
-	//     Schemes: http, https
 	//
 	//     Security:
 	//     - basicAuth:
 	//
 	//     Responses:
 	//       200: userResponse
-	authedRoutes.HandleFunc("/user", api.UserServer.GetUser)
+	authedRoutes.HandleFunc("/user", api.UserServer.GetUser).Methods(http.MethodGet)
 	// swagger:route POST /api/auth/login auth auth
 	//
 	// Login
@@ -180,8 +181,6 @@ func setupRoutes(api API, r *mux.Router) {
 	//     Produces:
 	//     - application/json
 	//
-	//     Schemes: http, https
-	//
 	//     security:
 	//       - basicAuth: []
 	//
@@ -193,12 +192,12 @@ func setupRoutes(api API, r *mux.Router) {
 	// Register a new user
 	//
 	// Register a new user of the app
-	//
+	//  Eventually this will verify that only a valid member can sign up.
+	//  Currently this endpoint doesn't work until we get a database.
 	//
 	//     Produces:
 	//     - application/json
 	//
-	//     Schemes: http, https
 	//
 	//     Responses:
 	//       200: endpointSuccessResponse
