@@ -22,17 +22,51 @@ func (b *InMemoryBountyStore) Update(m models.Bounty) error {
 	return nil
 }
 
-func (b *InMemoryBountyStore) Get(m models.Bounty) (models.Bounty, error) {
-	if _, ok := bounties[m.ID]; !ok {
-		return models.Bounty{}, errors.New("can't update a bounty doesn't exist")
+func (b *InMemoryBountyStore) Get(m models.Bounty) ([]models.Bounty, error) {
+	if m.ID == "" {
+		return bountyMapToSlice(bounties), nil
 	}
-	return bounties[m.ID], nil
+	if _, ok := bounties[m.ID]; !ok {
+		return []models.Bounty{}, errors.New("can't update a bounty doesn't exist")
+	}
+	return []models.Bounty{bounties[m.ID]}, nil
 }
 
-func (b *InMemoryBountyStore) GetAll() []models.Bounty {
-	return []models.Bounty{}
+func bountyMapToSlice(b map[string]models.Bounty) []models.Bounty {
+	var slice []models.Bounty
+
+	for _, v := range b {
+		slice = append(slice, v)
+	}
+
+	return slice
 }
 
-func (b *InMemoryBountyStore) Endorse(models.Bounty) error {
+func (b *InMemoryBountyStore) Endorse(bty models.Bounty, m models.Member) error {
+	if _, ok := bounties[bty.ID]; !ok {
+		return errors.New("could not find the bounty you were looking for")
+	}
+
+	if !bounties[bty.ID].IsOpen {
+		return errors.New("bounty is closed and can no longer receive endorsements")
+	}
+
+	for _, k := range bounties[bty.ID].Endorsements {
+		if k.ID == m.ID {
+			return errors.New("you have already endorsed this bounty")
+		}
+	}
+
+	endorsements := []models.Member{m}
+	endorsements = append(endorsements, bounties[bty.ID].Endorsements...)
+
+	bounties[bty.ID] = models.Bounty{
+		ID:           bounties[bty.ID].ID,
+		Title:        bounties[bty.ID].Title,
+		Description:  bounties[bty.ID].Description,
+		Endorsements: endorsements,
+		IsOpen:       bounties[bty.ID].IsOpen,
+	}
+
 	return nil
 }

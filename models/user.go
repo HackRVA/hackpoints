@@ -2,6 +2,35 @@ package models
 
 import "github.com/dgrijalva/jwt-go"
 
+type UserStore interface {
+	GetMemberByEmail(email string) (Member, error)
+	RegisterUser(Credentials) error
+}
+
+// swagger:response userResponse
+type userResponse struct {
+	Body Member
+}
+
+// tokenResponseBody for json response of signin
+// swagger:response loginResponse
+type tokenResponseBody struct {
+	// in: body
+	Body TokenResponse
+}
+
+// swagger:parameters loginRequest
+type loginRequest struct {
+	// in: body
+	Body Credentials
+}
+
+// swagger:parameters registerUserRequest
+type userRegisterRequest struct {
+	// in: body
+	Body Credentials
+}
+
 // Credentials Create a struct that models the structure of a user, both in the request body, and in the DB
 type Credentials struct {
 	// Password - the user's password

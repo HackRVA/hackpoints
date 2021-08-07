@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/shaj13/go-guardian/v2/auth"
 )
 
 func TestNewBounty(t *testing.T) {
@@ -114,7 +116,7 @@ func TestUpdateBounty(t *testing.T) {
 		Ack: true,
 	})
 
-	bs.store.New(models.Bounty{
+	bs.Store.New(models.Bounty{
 		ID:           "someID1",
 		Title:        "a new bounty",
 		Description:  "this is a fake bounty",
@@ -184,7 +186,7 @@ func TestGetBounty(t *testing.T) {
 		&in_memory.InMemoryBountyStore{},
 	}
 
-	bs.store.New(models.Bounty{
+	bs.Store.New(models.Bounty{
 		ID:           "someID1",
 		Title:        "a new bounty",
 		Description:  "this is a fake bounty",
@@ -210,7 +212,7 @@ func TestGetBounty(t *testing.T) {
 			Endorsements:        []models.Member{{Email: "test"}},
 			IsOpen:              true,
 			expectedHTTPStastub: http.StatusOK,
-			expectedResponse:    "{\"ID\":\"someID1\",\"Title\":\"a new bounty\",\"Description\":\"this is a fake bounty\",\"Endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"IsOpen\":true}",
+			expectedResponse:    "[{\"ID\":\"someID1\",\"Title\":\"a new bounty\",\"Description\":\"this is a fake bounty\",\"Endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"IsOpen\":true}]",
 		},
 		{
 			TestName:            "should throw error if we try to get a bounty that doesn't exist",
@@ -241,8 +243,138 @@ func TestGetBounty(t *testing.T) {
 
 func getBountyRequest(m models.Bounty) *http.Request {
 	reqBody, _ := json.Marshal(m)
-	req, _ := http.NewRequest(http.MethodPost, "/api/bounty/update", bytes.NewReader(reqBody))
+	req, _ := http.NewRequest(http.MethodPost, "/api/bounty/", bytes.NewReader(reqBody))
 	return req
+}
+
+func TestGetAllBounties(t *testing.T) {
+	bs := &BountyServer{
+		&in_memory.InMemoryBountyStore{},
+	}
+
+	bs.Store.New(models.Bounty{
+		ID:           "someID1",
+		Title:        "a new bounty",
+		Description:  "this is a fake bounty",
+		Endorsements: []models.Member{{Email: "test"}},
+		IsOpen:       true,
+	})
+
+	tests := []struct {
+		TestName            string
+		ID                  string
+		Title               string
+		Description         string
+		Endorsements        []models.Member
+		IsOpen              bool
+		expectedHTTPStastub int
+		expectedResponse    string
+	}{
+		{
+			TestName:            "should update an existing bounty",
+			ID:                  "someID1",
+			Title:               "a new bounty",
+			Description:         "this is a fake bounty",
+			Endorsements:        []models.Member{{Email: "test"}},
+			IsOpen:              true,
+			expectedHTTPStastub: http.StatusOK,
+			expectedResponse:    "[{\"ID\":\"someID1\",\"Title\":\"a new bounty\",\"Description\":\"this is a fake bounty\",\"Endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"IsOpen\":true}]",
+		},
+		{
+			TestName:            "should throw error if we try to get a bounty that doesn't exist",
+			ID:                  "doesn't exist",
+			Title:               "a new bounty",
+			Description:         "this is a fake bounty",
+			Endorsements:        []models.Member{{Email: "test"}},
+			IsOpen:              true,
+			expectedHTTPStastub: http.StatusNotFound,
+			expectedResponse:    ErrBountyNotFound.Error() + "\n",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.TestName, func(t *testing.T) {
+			request := getAllBountyRequest(models.Bounty{
+				ID: tt.ID,
+			})
+			response := httptest.NewRecorder()
+
+			bs.Get(response, request)
+
+			assertStatus(t, response.Code, tt.expectedHTTPStastub)
+			assertResponseBody(t, response.Body.String(), tt.expectedResponse)
+		})
+	}
+}
+
+func getAllBountyRequest(m models.Bounty) *http.Request {
+	reqBody, _ := json.Marshal(m)
+	req, _ := http.NewRequest(http.MethodPost, "/api/bounty/", bytes.NewReader(reqBody))
+	return req
+}
+
+// currently not working until we can get the user properly
+func testEndorseBounty(t *testing.T) {
+	bs := &BountyServer{
+		&in_memory.InMemoryBountyStore{},
+	}
+
+	bs.Store.New(models.Bounty{
+		ID:           "someID1",
+		Title:        "a new bounty",
+		Description:  "this is a fake bounty",
+		Endorsements: []models.Member{{Email: "test"}},
+		IsOpen:       true,
+	})
+
+	tests := []struct {
+		TestName            string
+		ID                  string
+		Title               string
+		Description         string
+		Endorsements        []models.Member
+		User                models.Member
+		Bounty              models.Bounty
+		IsOpen              bool
+		expectedHTTPStastub int
+		expectedResponse    string
+	}{
+		{
+			TestName:     "should endorse an existing bounty",
+			ID:           "someID1",
+			Title:        "a new bounty",
+			Description:  "this is a fake bounty",
+			Endorsements: []models.Member{},
+			User:         models.Member{Email: "test"},
+			Bounty: models.Bounty{
+				ID: "someID1",
+			},
+			IsOpen:              true,
+			expectedHTTPStastub: http.StatusOK,
+			expectedResponse:    "{\"ID\":\"someID1\",\"Title\":\"a new bounty\",\"Description\":\"this is a fake bounty\",\"Endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"IsOpen\":true}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.TestName, func(t *testing.T) {
+			request := postEndorsementRequest(models.Bounty{
+				ID: tt.ID,
+			})
+			response := httptest.NewRecorder()
+
+			bs.Endorse(response, request)
+
+			assertStatus(t, response.Code, tt.expectedHTTPStastub)
+			assertResponseBody(t, response.Body.String(), tt.expectedResponse)
+		})
+	}
+}
+
+func postEndorsementRequest(m models.Bounty) *http.Request {
+	reqBody, _ := json.Marshal(m)
+	req, _ := http.NewRequest(http.MethodPost, "/api/bounty/endorse", bytes.NewReader(reqBody))
+	auth.NewDefaultUser("test", "test", []string{}, nil)
+	return auth.RequestWithUser(auth.User(req), req)
 }
 
 func assertStatus(t testing.TB, got, want int) {

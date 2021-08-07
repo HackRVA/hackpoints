@@ -1,0 +1,441 @@
+{
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "security": [
+          {
+            "basicAuth": [
+              "[]"
+            ]
+          }
+        ],
+        "description": "Login accepts some json with the `email` and `password`\nand returns some json that has the token string",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "operationId": "auth",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/loginResponse"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "description": "Register a new user of the app",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Register a new user",
+        "operationId": "registerUserRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Credentials"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/endpointSuccessResponse"
+          }
+        }
+      }
+    },
+    "/api/bounty": {
+      "post": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "If no bounty is submitted, it will return all bounties.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "bounty"
+        ],
+        "summary": "Retrieves one or many bounties.",
+        "operationId": "bountyGetRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Bounty"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/bountyResponse"
+          }
+        }
+      }
+    },
+    "/api/bounty/endorse": {
+      "post": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "Endorse a bounty",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "bounty"
+        ],
+        "operationId": "bountyEndorseRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Bounty"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/endpointSuccessResponse"
+          }
+        }
+      }
+    },
+    "/api/bounty/new": {
+      "post": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "Creates a new bounty",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "bounty"
+        ],
+        "operationId": "bountyNewRequest",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Bounty"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/endpointSuccessResponse"
+          }
+        }
+      }
+    },
+    "/api/info": {
+      "get": {
+        "description": "Returns some debug info",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "info"
+        ],
+        "operationId": "info",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/infoResponse"
+          }
+        }
+      }
+    },
+    "/api/score": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "Shows the current score for the space",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "score"
+        ],
+        "operationId": "score",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/scoreResponse"
+          }
+        }
+      }
+    },
+    "/api/user": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "Shows the current logged in user",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "user"
+        ],
+        "operationId": "user",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/userResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Bounty": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "Endorsements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Member"
+          }
+        },
+        "ID": {
+          "type": "string"
+        },
+        "IsOpen": {
+          "type": "boolean"
+        },
+        "Title": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "Credentials": {
+      "description": "Credentials Create a struct that models the structure of a user, both in the request body, and in the DB",
+      "type": "object",
+      "required": [
+        "password",
+        "email"
+      ],
+      "properties": {
+        "email": {
+          "description": "Email - the users email",
+          "type": "string",
+          "x-go-name": "Email",
+          "example": "string"
+        },
+        "password": {
+          "description": "Password - the user's password",
+          "type": "string",
+          "x-go-name": "Password",
+          "example": "string"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "EndpointSuccess": {
+      "description": "EndpointSuccess -- success response",
+      "type": "object",
+      "properties": {
+        "ack": {
+          "type": "boolean",
+          "x-go-name": "Ack"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "InfoResponse": {
+      "description": "InfoResponse -- response of info request",
+      "type": "object",
+      "properties": {
+        "message": {
+          "description": "Info Message",
+          "type": "string",
+          "x-go-name": "Message",
+          "example": "hello, world!"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "Member": {
+      "description": "Member -- a member of the makerspace",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "Score": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Score"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    },
+    "TokenResponse": {
+      "description": "TokenResponse -- for json response of signin",
+      "type": "object",
+      "properties": {
+        "token": {
+          "description": "login response to send token string",
+          "type": "string",
+          "x-go-name": "Token",
+          "example": "\u003cTOKEN_STRING\u003e"
+        }
+      },
+      "x-go-package": "hackpoints/models"
+    }
+  },
+  "responses": {
+    "endpointSuccessResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/EndpointSuccess"
+      },
+      "headers": {
+        "Body": {}
+      }
+    },
+    "infoResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/InfoResponse"
+      },
+      "headers": {
+        "Body": {}
+      }
+    },
+    "loginResponse": {
+      "description": "tokenResponseBody for json response of signin",
+      "schema": {
+        "$ref": "#/definitions/TokenResponse"
+      }
+    },
+    "scoreResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Score"
+      },
+      "headers": {
+        "Body": {}
+      }
+    },
+    "userResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Member"
+      },
+      "headers": {
+        "Body": {}
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basicAuth": {
+      "description": "Enter your basic auth credentials",
+      "type": "basic",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "bearerAuth": {
+      "description": "Enter your bearer token",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

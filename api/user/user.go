@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
 	"hackpoints/api/auth"
 	"hackpoints/models"
 	"net/http"
@@ -10,13 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type UserStore interface {
-	GetMemberByEmail(email string) (models.Member, error)
-	RegisterUser(models.Credentials) error
-}
-
 type UserServer struct {
-	Store UserStore
+	Store models.UserStore
 	Auth  auth.AuthProvider
 }
 
@@ -73,7 +69,14 @@ func (u *UserServer) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UserServer) Login(w http.ResponseWriter, r *http.Request) {
-	token, err := u.Auth.IssueAccessToken(u.Auth.User(r))
+	log.Debug("attempting to login")
+	user := u.Auth.User(r)
+	if user == nil {
+		http.Error(w, errors.New("user is nil???").Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	token, err := u.Auth.IssueAccessToken(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return

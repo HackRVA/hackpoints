@@ -13,6 +13,14 @@ var users = map[string]models.Credentials{
 		Email:    "test",
 		Password: "test",
 	},
+	"test1": {
+		Email:    "test1",
+		Password: "test",
+	},
+	"test2": {
+		Email:    "test2",
+		Password: "test2",
+	},
 }
 
 func (mem InMemoryUserStore) GetMemberByEmail(email string) (models.Member, error) {
@@ -32,15 +40,18 @@ func (mem InMemoryUserStore) SignIn(username, password string) error {
 }
 
 func (mem InMemoryUserStore) RegisterUser(creds models.Credentials) error {
-	if len(creds.Email) > 2 {
-		users[creds.Email] = models.Credentials{
-			Email:    creds.Email,
-			Password: creds.Password,
-		}
+	if len(creds.Email) < 3 {
+		return errors.New("email too short")
 	}
 
-	if _, ok := users[creds.Email]; ok {
-		return errors.New("error registering user")
+	if _, ok := users[creds.Email]; !ok {
+		return errors.New("error registering user - not a member")
 	}
+
+	users[creds.Email] = models.Credentials{
+		Email:    creds.Email,
+		Password: creds.Password,
+	}
+
 	return nil
 }

@@ -36,10 +36,12 @@ type AuthServer struct {
 }
 
 func (a *AuthServer) IssueAccessToken(user auth.Info) (string, error) {
+	println("in auth info", user)
 	return jwt.IssueAccessToken(user, a.keeper, jwt.SetExpDuration(time.Hour*a.JWTInterval))
 }
 
 func (a *AuthServer) User(r *http.Request) auth.Info {
+	println("in auth user")
 	return auth.User(r)
 }
 
@@ -85,8 +87,8 @@ func (a *AuthServer) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, user, err := a.strategy.AuthenticateRequest(r)
 		if err != nil {
-			log.Println("whoa error", err)
-			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			log.Error("whoa error", err)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 		r = auth.RequestWithUser(user, r)

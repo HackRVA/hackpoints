@@ -4,18 +4,12 @@ import (
 	"encoding/json"
 	"hackpoints/models"
 	"net/http"
+
+	"github.com/shaj13/go-guardian/v2/auth"
 )
 
-type BountyStore interface {
-	New(models.Bounty) error
-	Update(models.Bounty) error
-	Get(models.Bounty) (models.Bounty, error)
-	GetAll() []models.Bounty
-	Endorse(models.Bounty) error
-}
-
 type BountyServer struct {
-	store BountyStore
+	Store models.BountyStore
 }
 
 func validateNewBounty(b models.Bounty) error {
@@ -45,7 +39,7 @@ func (b *BountyServer) New(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = b.store.New(*bounty)
+	err = b.Store.New(*bounty)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -66,7 +60,7 @@ func (b *BountyServer) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = b.store.Update(*bounty)
+	err = b.Store.Update(*bounty)
 	if err != nil {
 		http.Error(w, ErrUpdatingBounty.Error(), http.StatusBadRequest)
 		return
@@ -87,7 +81,7 @@ func (b *BountyServer) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := b.store.Get(*bounty)
+	response, err := b.Store.Get(*bounty)
 	if err != nil {
 		http.Error(w, ErrBountyNotFound.Error(), http.StatusNotFound)
 		return
@@ -98,6 +92,25 @@ func (b *BountyServer) Get(w http.ResponseWriter, r *http.Request) {
 	w.Write(j)
 }
 
-func (b *BountyServer) GetAll(w http.ResponseWriter, r *http.Request) {}
+func (b *BountyServer) Endorse(w http.ResponseWriter, r *http.Request) {
+	bounty := &models.Bounty{}
+	err := json.NewDecoder(r.Body).Decode(bounty)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-func (b *BountyServer) Endorse(w http.ResponseWriter, r *http.Request) {}
+	user := auth.UserFromCtx(r.Context())
+
+	err = b.Store.Endorse(*bounty, models.Member{Email: user.GetUserName()})
+	if err != nil {
+		http.Error(w, ErrUpdatingBounty.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	j, _ := json.Marshal(models.EndpointSuccess{
+		Ack: true,
+	})
+	w.Write(j)
+}

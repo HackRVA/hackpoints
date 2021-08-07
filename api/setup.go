@@ -1,6 +1,8 @@
 package api
 
 import (
+	"hackpoints/api/bounty"
+	"hackpoints/api/score"
 	"hackpoints/api/user"
 	"net/http"
 	"time"
@@ -10,13 +12,16 @@ import (
 )
 
 type API struct {
-	UserServer *user.UserServer
+	UserServer   *user.UserServer
+	ScoreServer  *score.ScoreServer
+	BountyServer *bounty.BountyServer
 }
 
 // Setup - setup the web server
 func Setup(a API) {
 	r := mux.NewRouter()
 
+	serveSwaggerUI(r)
 	setupRoutes(a, r)
 
 	srv := &http.Server{
@@ -27,6 +32,6 @@ func Setup(a API) {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Debug("Server listening on http://localhost:3000/")
+	log.Println("Server listening on http://localhost:3000/")
 	log.Fatal(srv.ListenAndServe())
 }
