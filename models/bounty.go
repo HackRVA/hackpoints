@@ -25,6 +25,11 @@ type bountyGetRequest struct {
 	Body Bounty
 }
 
+// swagger:response bountyResponse
+type bountyResponse struct {
+	Body Bounty
+}
+
 type Bounty struct {
 	ID           string
 	Title        string
