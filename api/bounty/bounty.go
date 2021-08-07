@@ -2,6 +2,7 @@ package bounty
 
 import (
 	"encoding/json"
+	"hackpoints/datastore"
 	"hackpoints/models"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 )
 
 type BountyServer struct {
-	Store models.BountyStore
+	Store datastore.BountyStore
 }
 
 func validateNewBounty(b models.Bounty) error {
@@ -38,7 +39,7 @@ func (b *BountyServer) New(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = b.Store.New(*bounty)
+	err = b.Store.NewBounty(*bounty)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -59,7 +60,7 @@ func (b *BountyServer) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = b.Store.Update(*bounty)
+	err = b.Store.UpdateBounty(*bounty)
 	if err != nil {
 		http.Error(w, ErrUpdatingBounty.Error(), http.StatusBadRequest)
 		return
@@ -79,7 +80,7 @@ func (b *BountyServer) Get(w http.ResponseWriter, r *http.Request) {
 		log.Debug("could not decode a bounty", err)
 	}
 
-	bounties, err := b.Store.Get(*bounty)
+	bounties, err := b.Store.GetBounties(*bounty)
 	if err != nil {
 		http.Error(w, ErrBountyNotFound.Error(), http.StatusNotFound)
 		return
@@ -100,7 +101,7 @@ func (b *BountyServer) Endorse(w http.ResponseWriter, r *http.Request) {
 
 	user := auth.UserFromCtx(r.Context())
 
-	err = b.Store.Endorse(*bounty, models.Member{Email: user.GetUserName()})
+	err = b.Store.EndorseBounty(*bounty, models.Member{Email: user.GetUserName()})
 	if err != nil {
 		http.Error(w, ErrUpdatingBounty.Error(), http.StatusBadRequest)
 		return
@@ -123,7 +124,7 @@ func (b *BountyServer) Close(w http.ResponseWriter, r *http.Request) {
 
 	bounty.IsOpen = false
 
-	err = b.Store.Update(*bounty)
+	err = b.Store.UpdateBounty(*bounty)
 	if err != nil {
 		http.Error(w, ErrUpdatingBounty.Error(), http.StatusBadRequest)
 		return

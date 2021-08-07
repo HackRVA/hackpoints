@@ -1,14 +1,12 @@
 package in_memory
 
-import "hackpoints/models"
+import (
+	"hackpoints/models"
+)
 
-type InMemoryScoreStore struct {
-	BountyStore models.BountyStore
-}
-
-func (i *InMemoryScoreStore) Get() (int, error) {
+func (i *Store) GetScore() (int, error) {
 	count := 0
-	bounties, err := i.BountyStore.Get(models.Bounty{})
+	bounties, err := i.GetBounties(models.Bounty{})
 	if err != nil {
 		return count, err
 	}

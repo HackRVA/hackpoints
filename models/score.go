@@ -1,9 +1,5 @@
 package models
 
-type ScoreStore interface {
-	Get() (int, error)
-}
-
 // swagger:response scoreResponse
 type scoreResponse struct {
 	Body Score

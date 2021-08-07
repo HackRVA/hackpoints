@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-type InMemoryUserStore struct{}
-
 var users = map[string]models.Credentials{
 	"test": {
 		Email:    "test",
@@ -23,7 +21,7 @@ var users = map[string]models.Credentials{
 	},
 }
 
-func (mem InMemoryUserStore) GetMemberByEmail(email string) (models.Member, error) {
+func (mem Store) GetMemberByEmail(email string) (models.Member, error) {
 	if val, ok := users[strings.ToLower(email)]; !ok {
 		return models.Member{Email: val.Email}, errors.New("not a valid member email")
 	}
@@ -31,7 +29,7 @@ func (mem InMemoryUserStore) GetMemberByEmail(email string) (models.Member, erro
 	return models.Member{Email: email}, nil
 }
 
-func (mem InMemoryUserStore) SignIn(username, password string) error {
+func (mem Store) SignIn(username, password string) error {
 	if users[username].Password != password {
 		return errors.New("error signing in")
 	}
@@ -39,7 +37,7 @@ func (mem InMemoryUserStore) SignIn(username, password string) error {
 	return nil
 }
 
-func (mem InMemoryUserStore) RegisterUser(creds models.Credentials) error {
+func (mem Store) RegisterUser(creds models.Credentials) error {
 	if len(creds.Email) < 3 {
 		return errors.New("email too short")
 	}

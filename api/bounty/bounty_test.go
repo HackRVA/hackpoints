@@ -14,7 +14,7 @@ import (
 
 func TestNewBounty(t *testing.T) {
 	bs := &BountyServer{
-		&in_memory.InMemoryBountyStore{},
+		&in_memory.Store{},
 	}
 
 	successResponse, _ := json.Marshal(models.EndpointSuccess{
@@ -99,14 +99,14 @@ func newBountyRequest(m models.Bounty) *http.Request {
 
 func TestUpdateBounty(t *testing.T) {
 	bs := &BountyServer{
-		&in_memory.InMemoryBountyStore{},
+		&in_memory.Store{},
 	}
 
 	successResponse, _ := json.Marshal(models.EndpointSuccess{
 		Ack: true,
 	})
 
-	bs.Store.New(models.Bounty{
+	bs.Store.NewBounty(models.Bounty{
 		Title:       "a new bounty",
 		Description: "this is a fake bounty",
 	})
@@ -170,10 +170,10 @@ func updateBountyRequest(m models.Bounty) *http.Request {
 
 func TestGetBounty(t *testing.T) {
 	bs := &BountyServer{
-		&in_memory.InMemoryBountyStore{},
+		&in_memory.Store{},
 	}
 
-	bs.Store.New(models.Bounty{
+	bs.Store.NewBounty(models.Bounty{
 		Title:       "a new bounty",
 		Description: "this is a fake bounty",
 		IsOpen:      true,
@@ -229,10 +229,10 @@ func getBountyRequest(m models.Bounty) *http.Request {
 
 func TestGetAllBounties(t *testing.T) {
 	bs := &BountyServer{
-		&in_memory.InMemoryBountyStore{},
+		&in_memory.Store{},
 	}
 
-	bs.Store.New(models.Bounty{
+	bs.Store.NewBounty(models.Bounty{
 		Title:       "a new bounty",
 		Description: "this is a fake bounty",
 	})
@@ -291,10 +291,10 @@ func getAllBountyRequest(m models.Bounty) *http.Request {
 // currently not working until we can get the user properly
 func testEndorseBounty(t *testing.T) {
 	bs := &BountyServer{
-		&in_memory.InMemoryBountyStore{},
+		&in_memory.Store{},
 	}
 
-	bs.Store.New(models.Bounty{
+	bs.Store.NewBounty(models.Bounty{
 		ID:           "someID1",
 		Title:        "a new bounty",
 		Description:  "this is a fake bounty",

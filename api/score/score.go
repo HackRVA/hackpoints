@@ -3,12 +3,13 @@ package score
 import (
 	"encoding/json"
 	"errors"
+	"hackpoints/datastore"
 	"hackpoints/models"
 	"net/http"
 )
 
 type ScoreServer struct {
-	Store models.ScoreStore
+	Store datastore.ScoreStore
 }
 
 var (
@@ -16,7 +17,7 @@ var (
 )
 
 func (s *ScoreServer) Get(w http.ResponseWriter, r *http.Request) {
-	score, err := s.Store.Get()
+	score, err := s.Store.GetScore()
 	if err != nil {
 		http.Error(w, ErrGettingScore.Error(), http.StatusNotFound)
 		return

@@ -9,9 +9,7 @@ import (
 
 func TestGetScore(t *testing.T) {
 	server := &ScoreServer{
-		Store: &in_memory.InMemoryScoreStore{
-			BountyStore: &in_memory.InMemoryBountyStore{},
-		},
+		Store: &in_memory.Store{},
 	}
 
 	tests := []struct {
