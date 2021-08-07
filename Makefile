@@ -13,6 +13,11 @@ run: ## run the code.
 ##
 	go run .
 
+.PHONY:docker
+docker: ## run the code.
+##
+	docker-compose up --build
+
 .PHONY:build
 build: ## build the code.
 ##
