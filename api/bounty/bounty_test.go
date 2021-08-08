@@ -17,6 +17,8 @@ func TestNewBounty(t *testing.T) {
 		&in_memory.Store{},
 	}
 
+	in_memory.ClearBounties()
+
 	successResponse, _ := json.Marshal(models.EndpointSuccess{
 		Ack: true,
 	})
@@ -101,6 +103,7 @@ func TestUpdateBounty(t *testing.T) {
 	bs := &BountyServer{
 		&in_memory.Store{},
 	}
+	in_memory.ClearBounties()
 
 	successResponse, _ := json.Marshal(models.EndpointSuccess{
 		Ack: true,
@@ -232,8 +235,18 @@ func TestGetAllBounties(t *testing.T) {
 		&in_memory.Store{},
 	}
 
+	in_memory.ClearBounties()
+
 	bs.Store.NewBounty(models.Bounty{
 		Title:       "a new bounty",
+		Description: "this is a fake bounty",
+	})
+	bs.Store.NewBounty(models.Bounty{
+		Title:       "a new bounty1",
+		Description: "this is a fake bounty",
+	})
+	bs.Store.NewBounty(models.Bounty{
+		Title:       "a new bounty2",
 		Description: "this is a fake bounty",
 	})
 
@@ -253,7 +266,7 @@ func TestGetAllBounties(t *testing.T) {
 			Description:         "this is a fake bounty",
 			IsOpen:              true,
 			expectedHTTPStastub: http.StatusOK,
-			expectedResponse:    "[{\"id\":\"1\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":[{\"id\":\"\",\"name\":\"\",\"email\":\"test\"}],\"isOpen\":true},{\"id\":\"2\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true},{\"id\":\"3\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true},{\"id\":\"4\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true}]",
+			expectedResponse:    "[{\"id\":\"1\",\"title\":\"a new bounty\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true},{\"id\":\"2\",\"title\":\"a new bounty1\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true},{\"id\":\"3\",\"title\":\"a new bounty2\",\"description\":\"this is a fake bounty\",\"endorsements\":null,\"isOpen\":true}]",
 		},
 		{
 			TestName:            "should throw error if we try to get a bounty that doesn't exist",

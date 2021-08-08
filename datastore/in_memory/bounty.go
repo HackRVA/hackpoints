@@ -73,3 +73,7 @@ func (b *Store) EndorseBounty(bty models.Bounty, m models.Member) error {
 
 	return nil
 }
+
+func ClearBounties() {
+	bounties = make(map[string]models.Bounty)
+}
