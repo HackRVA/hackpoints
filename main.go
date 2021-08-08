@@ -10,18 +10,15 @@ import (
 )
 
 func main() {
+	datastore := &in_memory.Store{}
 	api.Setup(api.API{
 		UserServer: &user.UserServer{
-			Store: &in_memory.InMemoryUserStore{},
-			Auth:  auth.Setup(&in_memory.InMemoryUserStore{}),
+			Store: datastore,
+			Auth:  auth.Setup(datastore),
 		},
-		BountyServer: &bounty.BountyServer{
-			Store: &in_memory.InMemoryBountyStore{},
-		},
+		BountyServer: &bounty.BountyServer{},
 		ScoreServer: &score.ScoreServer{
-			Store: &in_memory.InMemoryScoreStore{
-				BountyStore: &in_memory.InMemoryBountyStore{},
-			},
+			Store: datastore,
 		},
 	})
 }

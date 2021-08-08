@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"hackpoints/api/auth"
+	"hackpoints/datastore"
 	"hackpoints/models"
 	"net/http"
 	"strings"
@@ -12,7 +13,7 @@ import (
 )
 
 type UserServer struct {
-	Store models.UserStore
+	Store datastore.UserStore
 	Auth  auth.AuthProvider
 }
 

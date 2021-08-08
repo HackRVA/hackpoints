@@ -2,11 +2,6 @@ package models
 
 import "github.com/dgrijalva/jwt-go"
 
-type UserStore interface {
-	GetMemberByEmail(email string) (Member, error)
-	RegisterUser(Credentials) error
-}
-
 // swagger:response userResponse
 type userResponse struct {
 	Body Member

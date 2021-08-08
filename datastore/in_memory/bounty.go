@@ -8,16 +8,16 @@ import (
 
 var bounties = map[string]models.Bounty{}
 
-type InMemoryBountyStore struct{}
+type Store struct{}
 
-func (b *InMemoryBountyStore) New(m models.Bounty) error {
+func (b *Store) NewBounty(m models.Bounty) error {
 	m.ID = strconv.Itoa(len(bounties) + 1)
 	m.IsOpen = true
 	bounties[m.ID] = m
 	return nil
 }
 
-func (b *InMemoryBountyStore) Update(m models.Bounty) error {
+func (b *Store) UpdateBounty(m models.Bounty) error {
 	if _, ok := bounties[m.ID]; !ok {
 		return errors.New("can't update a bounty doesn't exist")
 	}
@@ -25,7 +25,7 @@ func (b *InMemoryBountyStore) Update(m models.Bounty) error {
 	return nil
 }
 
-func (b *InMemoryBountyStore) Get(m models.Bounty) ([]models.Bounty, error) {
+func (b *Store) GetBounties(m models.Bounty) ([]models.Bounty, error) {
 	if m.ID == "" {
 		return bountyMapToSlice(bounties), nil
 	}
@@ -45,7 +45,7 @@ func bountyMapToSlice(b map[string]models.Bounty) []models.Bounty {
 	return slice
 }
 
-func (b *InMemoryBountyStore) Endorse(bty models.Bounty, m models.Member) error {
+func (b *Store) EndorseBounty(bty models.Bounty, m models.Member) error {
 	if _, ok := bounties[bty.ID]; !ok {
 		return errors.New("could not find the bounty you were looking for")
 	}
@@ -72,4 +72,8 @@ func (b *InMemoryBountyStore) Endorse(bty models.Bounty, m models.Member) error 
 	}
 
 	return nil
+}
+
+func ClearBounties() {
+	bounties = make(map[string]models.Bounty)
 }

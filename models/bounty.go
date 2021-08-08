@@ -1,12 +1,5 @@
 package models
 
-type BountyStore interface {
-	New(Bounty) error
-	Update(Bounty) error
-	Get(Bounty) ([]Bounty, error)
-	Endorse(Bounty, Member) error
-}
-
 // swagger:parameters bountyNewRequest
 type bountyNewRequest struct {
 	// in: body
